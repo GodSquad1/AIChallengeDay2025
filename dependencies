@@ -1,0 +1,13 @@
+
+npm init -y
+npm install tailwindcss postcss autoprefixer --save-dev
+npm install @fortawesome/fontawesome-free
+brew install node
+sudo apt update && sudo apt install nodejs npm
+mkdir health-chat-assistant
+cd health-chat-assistant
+npm init -y
+npm install -D tailwindcss postcss autoprefixer
+npx tailwindcss init -p
+npm install -g live-server
+npm create vite@latest
