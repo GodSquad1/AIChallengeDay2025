@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Peer+</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style id="app-style">
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f0f4f8;
+      color: #334155;
+    }
+    
+    .chat-container {
+      max-height: calc(100vh - 180px);
+      overflow-y: auto;
+      padding: 1rem;
+    }
+    
+    .user-message {
+      background-color: #4f46e5;
+      color: white;
+      border-radius: 18px 18px 0 18px;
+      box-shadow: 4px 4px 10px rgba(79, 70, 229, 0.2);
+      transform-origin: right bottom;
+      transition: all 0.3s ease;
+    }
+    
+    .user-message:hover {
+      transform: translateY(-2px);
+      box-shadow: 6px 6px 12px rgba(79, 70, 229, 0.3);
+    }
+    
+    .bot-message {
+      background-color: #ffffff;
+      color: #334155;
+      border-radius: 18px 18px 18px 0;
+      box-shadow: 6px 6px 12px rgba(0, 0, 0, 0.05), 
+                  -6px -6px 12px rgba(255, 255, 255, 0.8);
+      transform-origin: left bottom;
+      transition: all 0.3s ease;
+    }
+    
+    .bot-message:hover {
+      transform: translateY(-2px);
+      box-shadow: 8px 8px 16px rgba(0, 0, 0, 0.06), 
+                  -8px -8px 16px rgba(255, 255, 255, 0.9);
+    }
+    
+    .typing-indicator {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.5rem;
+    }
+    
+    .typing-indicator span {
+      display: block;
+      width: 8px;
+      height: 8px;
+      background-color: #4f46e5;
+      border-radius: 50%;
+      margin: 0 2px;
+      animation: bounce 1.4s infinite ease-in-out both;
+    }
+    
+    .typing-indicator span:nth-child(1) {
+      animation-delay: -0.32s;
+    }
+    
+    .typing-indicator span:nth-child(2) {
+      animation-delay: -0.16s;
+    }
+    
+    @keyframes bounce {
+      0%, 80%, 100% { 
+        transform: scale(0);
+      } 
+      40% { 
+        transform: scale(1);
+      }
+    }
+    
+    .urgent-alert {
+      background-color: #fee2e2;
+      border-left: 4px solid #ef4444;
+      border-radius: 10px;
+      box-shadow: 4px 4px 10px rgba(239, 68, 68, 0.15);
+      transition: all 0.3s ease;
+    }
+    
+    .clinic-card {
+      transition: all 0.3s ease;
+      background: #ffffff;
+      border-radius: 12px;
+      box-shadow: 6px 6px 12px rgba(0, 0, 0, 0.05), 
+                  -6px -6px 12px rgba(255, 255, 255, 0.8);
+    }
+    
+    .clinic-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 8px 8px 16px rgba(0, 0, 0, 0.08), 
+                  -8px -8px 16px rgba(255, 255, 255, 0.9);
+    }
+    
+    .article-card {
+      transition: all 0.3s ease;
+      background: #ffffff;
+      border-radius: 12px;
+      box-shadow: 6px 6px 12px rgba(0, 0, 0, 0.05), 
+                  -6px -6px 12px rgba(255, 255, 255, 0.8);
+      border: none;
+    }
+    
+    .article-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 8px 8px 16px rgba(0, 0, 0, 0.08), 
+                  -8px -8px 16px rgba(255, 255, 255, 0.9);
+    }
+    
+    /* Custom scrollbar */
+    .chat-container::-webkit-scrollbar {
+      width: 6px;
+    }
+    
+    .chat-container::-webkit-scrollbar-track {
+      background: rgba(241, 241, 241, 0.5);
+      border-radius: 10px;
+    }
+    
+    .chat-container::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 10px;
+    }
+    
+    .chat-container::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+    
+    /* Slide-in animation for messages */
+    @keyframes slideIn {
+      from { 
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to { 
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .message-animation {
+      animation: slideIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    }
+    
+    /* Button styles */
+    button {
+      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    
+    button:active {
+      transform: scale(0.95);
+    }
+    
+    /* Toggle switch styles */
+    .toggle-switch {
+      position: relative;
+      width: 50px;
+      height: 26px;
+      background-color: #e2e8f0;
+      border-radius: 50px;
+      box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.1), 
+                  inset -2px -2px 5px rgba(255, 255, 255, 0.8);
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    
+    .toggle-switch::after {
+      content: '';
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      background-color: white;
+      box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.15);
+      border-radius: 50%;
+      height: 20px;
+      width: 20px;
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    /* When checkbox is checked, move the toggle */
+    #save-history:checked + .toggle-switch::after {
+      transform: translateX(24px);
+      background: #ffffff;
+    }
+
+    /* Change background when checked */
+    #save-history:checked + .toggle-switch {
+      background-color: #4f46e5;
+      box-shadow: inset 2px 2px 5px rgba(79, 70, 229, 0.3), 
+                  inset -2px -2px 5px rgba(79, 70, 229, 0.1);
+    }
+    
+    /* Header styles */
+    header {
+      background: #ffffff;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+      border-radius: 0 0 15px 15px;
+    }
+    
+    /* Input area */
+    #user-input {
+      background: #f8fafc;
+      box-shadow: inset 3px 3px 7px rgba(0, 0, 0, 0.05),
+                  inset -3px -3px 7px rgba(255, 255, 255, 0.8);
+      transition: all 0.3s ease;
+    }
+    
+    #user-input:focus {
+      box-shadow: inset 4px 4px 8px rgba(0, 0, 0, 0.08),
+                  inset -4px -4px 8px rgba(255, 255, 255, 0.9);
+      background: #ffffff;
+    }
+    
+    /* Submit button */
+    button[type="submit"] {
+      background: linear-gradient(145deg, #4338ca, #4f46e5);
+      box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.1), 
+                  -4px -4px 8px rgba(255, 255, 255, 0.5);
+    }
+    
+    button[type="submit"]:hover {
+      background: linear-gradient(145deg, #4f46e5, #4338ca);
+      transform: translateY(-2px);
+    }
+    
+    button[type="submit"]:active {
+      box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.2);
+      transform: translateY(0);
+    }
+    
+    /* New chat button */
+    #new-chat-btn {
+      background: linear-gradient(145deg, #4338ca, #4f46e5);
+      box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.1), 
+                  -4px -4px 8px rgba(255, 255, 255, 0.5);
+    }
+    
+    #new-chat-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 6px 6px 12px rgba(0, 0, 0, 0.15), 
+                  -6px -6px 12px rgba(255, 255, 255, 0.6);
+    }
+    
+    /* Find clinics button */
+    #find-clinics-btn {
+      background: linear-gradient(145deg, #4338ca, #4f46e5);
+      box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.1), 
+                  -4px -4px 8px rgba(255, 255, 255, 0.5);
+      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    
+    #find-clinics-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 6px 6px 12px rgba(0, 0, 0, 0.15), 
+                  -6px -6px 12px rgba(255, 255, 255, 0.6);
+    }
+    
+    /* Summarize article button */
+    .summarize-article {
+      background: #f1f5f9;
+      box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.05), 
+                  -2px -2px 5px rgba(255, 255, 255, 0.8);
+      transition: all 0.3s ease;
+    }
+    
+    .summarize-article:hover {
+      background: #e2e8f0;
+      transform: translateY(-2px);
+    }
+    
+    .article-summary {
+      border-radius: 10px;
+      box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.05),
+                  inset -2px -2px 5px rgba(255, 255, 255, 0.8);
+    }
+  </style>
+</head>
+<body class="h-screen flex flex-col">
+  <header class="bg-white shadow-sm py-3 px-4 flex justify-between items-center">
+    <h1 class="text-xl font-semibold text-gray-800">
+      <i class="fas fa-comment-medical text-blue-500 mr-2"></i>
+      Peer+ (Pre-Exam Evaluative Resource)
+    </h1>
+    <div class="flex items-center">
+      <span class="text-sm text-gray-600 mr-2">Save History</span>
+      <label class="relative inline-flex items-center cursor-pointer">
+        <input type="checkbox" id="save-history" class="sr-only">
+        <div class="toggle-switch w-11 h-6 bg-gray-200 rounded-full"></div>
+      </label>
+    </div>
+  </header>
+
+  <main class="flex-1 overflow-hidden flex flex-col max-w-4xl mx-auto w-full px-4 py-2">
+    <!-- Chat container -->
+    <div id="chat-container" class="chat-container flex-1 overflow-y-auto mb-4 space-y-4 px-1 py-2">
+      <!-- Welcome message -->
+      <div class="flex">
+        <div class="bot-message p-3 max-w-xs md:max-w-md lg:max-w-lg message-animation">
+          <p>Hello! I'm Peer+! How can I help you today?</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Urgent care alert (hidden by default) -->
+    <div id="urgent-alert" class="urgent-alert p-4 rounded-lg mb-4 hidden message-animation">
+      <div class="flex">
+        <div class="flex-shrink-0">
+          <i class="fas fa-exclamation-triangle text-red-600 text-xl"></i>
+        </div>
+        <div class="ml-3">
+          <h3 class="text-sm font-medium text-red-800">Urgent Care Recommended</h3>
+          <div class="mt-2 text-sm text-red-700">
+            <p>Based on your symptoms, please seek immediate medical attention. Go to the nearest emergency room or call 911.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Clinic finder section (hidden by default) -->
+    <div id="clinic-finder" class="bg-white rounded-lg shadow-sm p-4 mb-4 hidden message-animation">
+      <h3 class="font-medium text-gray-800 mb-3">Nearby Low-Cost Clinics</h3>
+      <div id="clinic-list" class="space-y-3">
+        <!-- Clinics will be inserted here -->
+      </div>
+    </div>
+
+    <!-- Input area -->
+    <div class="bg-white rounded-lg shadow-sm p-3 mt-auto">
+      <form id="chat-form" class="flex items-center">
+        <input 
+          type="text" 
+          id="user-input" 
+          class="flex-1 border border-gray-300 rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          placeholder="Type your health question..."
+          autocomplete="off"
+        >
+        <button 
+          type="submit" 
+          class="ml-2 bg-blue-500 text-white rounded-full p-2 w-10 h-10 flex items-center justify-center hover:bg-blue-600 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+        >
+          <i class="fas fa-paper-plane"></i>
+        </button>
+      </form>
+    </div>
+  </main>
+
+  <!-- Health Resources Section -->
+  <section class="bg-white border-t border-gray-200 py-4">
+    <div class="max-w-4xl mx-auto px-4">
+      <h2 class="text-lg font-semibold text-gray-800 mb-3">Health Resources</h2>
+      <div id="resources-container" class="space-y-2">
+        <div class="article-card p-3 border border-gray-200 rounded-lg">
+          <div class="flex justify-between items-center">
+            <h3 class="font-medium text-gray-700">Understanding Blood Pressure: The Silent Killer</h3>
+            <button class="summarize-article text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-1 px-3 rounded-md transition-colors">
+              Summarize
+            </button>
+          </div>
+          <div class="article-summary mt-2 hidden bg-gray-50 p-3 rounded-md text-sm text-gray-600">
+            <!-- Summary will be inserted here -->
+          </div>
+        </div>
+        <div class="article-card p-3 border border-gray-200 rounded-lg">
+          <div class="flex justify-between items-center">
+            <h3 class="font-medium text-gray-700">Managing Anxiety and Stress: Practical Tips</h3>
+            <button class="summarize-article text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-1 px-3 rounded-md transition-colors">
+              Summarize
+            </button>
+          </div>
+          <div class="article-summary mt-2 hidden bg-gray-50 p-3 rounded-md text-sm text-gray-600">
+            <!-- Summary will be inserted here -->
+          </div>
+        </div>
+        <div class="article-card p-3 border border-gray-200 rounded-lg">
+          <div class="flex justify-between items-center">
+            <h3 class="font-medium text-gray-700">Nutrition Basics: Building a Balanced Diet</h3>
+            <button class="summarize-article text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-1 px-3 rounded-md transition-colors">
+              Summarize
+            </button>
+          </div>
+          <div class="article-summary mt-2 hidden bg-gray-50 p-3 rounded-md text-sm text-gray-600">
+            <!-- Summary will be inserted here -->
+          </div>
+        </div>
+      </div>
+      
+      <div class="mt-4 text-center">
+        <button id="new-chat-btn" class="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-6 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+          <i class="fas fa-plus mr-2"></i>Start New Chat
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <script id="app-script">
+    // Chat state
+    const state = {
+      conversationHistory: [],
+      saveHistory: false,
+      isLoading: false
+    };
+
+    // DOM Elements
+    const chatContainer = document.getElementById('chat-container');
+    const chatForm = document.getElementById('chat-form');
+    const userInput = document.getElementById('user-input');
+    const saveHistoryToggle = document.getElementById('save-history');
+    const newChatBtn = document.getElementById('new-chat-btn');
+    const urgentAlert = document.getElementById('urgent-alert');
+    const clinicFinder = document.getElementById('clinic-finder');
+    const clinicList = document.getElementById('clinic-list');
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+      // Load conversation history from localStorage
+      loadChatHistory();
+      
+      // Event Listeners
+      chatForm.addEventListener('submit', handleChatSubmit);
+      saveHistoryToggle.addEventListener('change', toggleSaveHistory);
+      newChatBtn.addEventListener('click', startNewChat);
+      
+      // Set up article summarize buttons
+      document.querySelectorAll('.summarize-article').forEach(button => {
+        button.addEventListener('click', handleArticleSummarize);
+      });
+    });
+
+    // Load chat history from localStorage if enabled
+    function loadChatHistory() {
+      const savedHistory = localStorage.getItem('chatHistory');
+      const savedPreference = localStorage.getItem('saveHistory');
+      
+      if (savedPreference === 'true') {
+        saveHistoryToggle.checked = true;
+        state.saveHistory = true;
+        
+        if (savedHistory) {
+          try {
+            const history = JSON.parse(savedHistory);
+            state.conversationHistory = history;
+            
+            // Render saved messages
+            history.forEach(message => {
+              if (message.sender === 'user') {
+                addUserMessage(message.text);
+              } else {
+                addBotMessage(message.text);
+              }
+            });
+            
+            // Scroll to bottom
+            scrollToBottom();
+          } catch (e) {
+            console.error('Error parsing saved chat history:', e);
+          }
+        }
+      }
+    }
+
+    // Toggle save history preference
+    function toggleSaveHistory(e) {
+      state.saveHistory = e.target.checked;
+      localStorage.setItem('saveHistory', state.saveHistory);
+      
+      if (!state.saveHistory) {
+        // Clear saved history
+        localStorage.removeItem('chatHistory');
+      }
+    }
+
+    // Handle user submitting a message
+    function handleChatSubmit(e) {
+      e.preventDefault();
+      const message = userInput.value.trim();
+      
+      if (message && !state.isLoading) {
+        // Add user message to UI
+        addUserMessage(message);
+        
+        // Add to history
+        state.conversationHistory.push({
+          sender: 'user',
+          text: message
+        });
+        
+        // Save to localStorage if enabled
+        saveToLocalStorage();
+        
+        // Clear input
+        userInput.value = '';
+        
+        // Show loading indicator
+        showLoadingIndicator();
+        
+        // Call Symptom Advisor API (simulated)
+        callSymptomAdvisorLoop(message);
+      }
+    }
+
+    // Add user message to the chat UI
+    function addUserMessage(message) {
+      const messageElement = document.createElement('div');
+      messageElement.className = 'flex justify-end';
+      messageElement.innerHTML = `
+        <div class="user-message p-3 max-w-xs md:max-w-md lg:max-w-lg message-animation">
+          <p>${escapeHTML(message)}</p>
+        </div>
+      `;
+      chatContainer.appendChild(messageElement);
+      scrollToBottom();
+    }
+
+    // Add bot message to the chat UI
+    function addBotMessage(message) {
+      const messageElement = document.createElement('div');
+      messageElement.className = 'flex';
+      messageElement.innerHTML = `
+        <div class="bot-message p-3 max-w-xs md:max-w-md lg:max-w-lg message-animation">
+          <p>${message}</p>
+        </div>
+      `;
+      chatContainer.appendChild(messageElement);
+      scrollToBottom();
+    }
+
+    // Show loading indicator while waiting for response
+    function showLoadingIndicator() {
+      state.isLoading = true;
+      const loadingElement = document.createElement('div');
+      loadingElement.className = 'flex';
+      loadingElement.id = 'loading-indicator';
+      loadingElement.innerHTML = `
+        <div class="bot-message p-3 max-w-xs md:max-w-md message-animation">
+          <div class="typing-indicator flex space-x-1">
+            <span class="w-2 h-2 bg-gray-400 rounded-full"></span>
+            <span class="w-2 h-2 bg-gray-400 rounded-full"></span>
+            <span class="w-2 h-2 bg-gray-400 rounded-full"></span>
+          </div>
+        </div>
+      `;
+      chatContainer.appendChild(loadingElement);
+      scrollToBottom();
+    }
+
+    // Remove loading indicator
+    function removeLoadingIndicator() {
+      const loadingIndicator = document.getElementById('loading-indicator');
+      if (loadingIndicator) {
+        loadingIndicator.remove();
+      }
+      state.isLoading = false;
+    }
+
+    // Scroll chat to bottom
+    function scrollToBottom() {
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+
+    // Save conversation to localStorage
+    function saveToLocalStorage() {
+      if (state.saveHistory) {
+        localStorage.setItem('chatHistory', JSON.stringify(state.conversationHistory));
+      }
+    }
+
+    // Start new chat
+    function startNewChat() {
+      // Clear chat UI
+      while (chatContainer.firstChild) {
+        chatContainer.removeChild(chatContainer.firstChild);
+      }
+      
+      // Add welcome message
+      addBotMessage("Hello! I'm Peer+. How can I help you today?");
+      
+      // Clear conversation history
+      state.conversationHistory = [];
+      
+      // Clear localStorage if saving is enabled
+      if (state.saveHistory) {
+        localStorage.removeItem('chatHistory');
+      }
+      
+      // Hide any alerts or clinic finder
+      urgentAlert.classList.add('hidden');
+      clinicFinder.classList.add('hidden');
+    }
+
+    // Handle article summarization
+    function handleArticleSummarize(e) {
+      const button = e.target;
+      const articleCard = button.closest('.article-card');
+      const summaryDiv = articleCard.querySelector('.article-summary');
+      const articleTitle = articleCard.querySelector('h3').textContent;
+      
+      // Toggle summary visibility if already loaded
+      if (summaryDiv.textContent.trim()) {
+        summaryDiv.classList.toggle('hidden');
+        return;
+      }
+      
+      // Show loading in summary div
+      summaryDiv.textContent = 'Loading summary...';
+      summaryDiv.classList.remove('hidden');
+      
+      // Call Article Summarizer API (simulated)
+      callArticleSummarizerLoop(articleTitle, summaryDiv);
+    }
+
+    // Simulated API calls
+    function callSymptomAdvisorLoop(message) {
+      // Show loading indicator already implemented before this function is called
+
+      // Replace with real Magic Loops API call
+      fetch('https://magicloops.dev/api/loop/16856f65-dac8-402f-9d31-d04c336c5959/run', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          message: message,
+          location: {
+            latitude: 37.7749, // Dummy coordinates
+            longitude: -122.4194
+          }
+        })
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
+      .then(data => {
+        removeLoadingIndicator();
+        
+        // Add bot response
+        addBotMessage(data.response);
+        
+        // Add to history
+        state.conversationHistory.push({
+          sender: 'bot',
+          text: data.response
+        });
+        
+        // Handle urgent condition if the API indicates it
+        if (data.recommendationLevel === 'urgent') {
+          urgentAlert.classList.remove('hidden');
+        }
+        
+        // Add clinic finder button if API suggests it
+        if (data.clinicSuggested) {
+          const buttonElement = document.createElement('div');
+          buttonElement.className = 'flex mt-2';
+          buttonElement.innerHTML = `
+            <button id="find-clinics-btn" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors">
+              <i class="fas fa-map-marker-alt mr-2"></i>Find Clinics Near Me
+            </button>
+          `;
+          chatContainer.appendChild(buttonElement);
+          
+          // Add event listener to the button
+          document.getElementById('find-clinics-btn').addEventListener('click', findClinics);
+        }
+        
+        // Save to localStorage if enabled
+        saveToLocalStorage();
+      })
+      .catch(error => {
+        removeLoadingIndicator();
+        console.error('Error:', error);
+        addBotMessage("I'm sorry, I'm having trouble connecting to the server. Please try again later.");
+      });
+    }
+
+    // Find clinics (real API call)
+    function findClinics() {
+      // Hide any previous clinic results
+      clinicFinder.classList.add('hidden');
+      
+      // Show loading message
+      addBotMessage("Looking for clinics near you...");
+      
+      // Use Magic Loops API endpoint for finding clinics
+      fetch('https://magicloops.dev/api/loop/c39b1a90-ec31-40a0-8fbe-fbd71826ccfc/run', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          latitude: 37.7749, // Dummy coordinates
+          longitude: -122.4194
+        })
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
+      .then(data => {
+        // Clear previous clinic list
+        clinicList.innerHTML = '';
+        
+        // Add clinics to the UI from the API response
+        data.clinics.forEach(clinic => {
+          const clinicElement = document.createElement('div');
+          clinicElement.className = 'clinic-card bg-gray-50 p-3 rounded-lg border border-gray-200';
+          clinicElement.innerHTML = `
+            <h4 class="font-medium text-gray-800">${clinic.name}</h4>
+            <p class="text-sm text-gray-600 mt-1">${clinic.address}</p>
+            <div class="flex justify-between items-center mt-2">
+              <span class="text-sm text-gray-500">
+                <i class="fas fa-phone-alt text-blue-500 mr-1"></i>${clinic.phone}
+              </span>
+              <span class="text-sm text-gray-500">
+                <i class="fas fa-map-pin text-blue-500 mr-1"></i>${clinic.distance}
+              </span>
+            </div>
+            <div class="mt-2">
+              <a href="${clinic.mapUrl}" target="_blank" class="text-sm text-blue-500 hover:text-blue-700 flex items-center">
+                <i class="fas fa-directions mr-1"></i>Get directions
+              </a>
+            </div>
+          `;
+          clinicList.appendChild(clinicElement);
+        });
+        
+        // Show clinic finder section
+        clinicFinder.classList.remove('hidden');
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        addBotMessage("I'm sorry, I couldn't find clinics near you. Please try again later.");
+      });
+    }
+
+    // Article summarizer (real API call)
+    function callArticleSummarizerLoop(articleTitle, summaryDiv) {
+      // Replace simulated API call with real fetch
+      fetch('http://localhost:8000/api/article-summarizer', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          title: articleTitle
+        })
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
+      .then(data => {
+        // Update summary div with response from API
+        summaryDiv.innerHTML = data.summary;
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        summaryDiv.innerHTML = "I'm sorry, I couldn't generate a summary right now. Please try again later.";
+      });
+    }
+
+    // Helper function to escape HTML and prevent XSS
+    function escapeHTML(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+  </script>
+</body>
+</html>
