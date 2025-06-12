@@ -6,80 +6,7 @@
   <title>Peer+ Health Chat</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <style id="app-style">
-    @keyframes slideInLeft {
-      from { transform: translateX(-100%); opacity: 0; }
-      to { transform: translateX(0); opacity: 1; }
-    }
-    
-    @keyframes slideInRight {
-      from { transform: translateX(100%); opacity: 0; }
-      to { transform: translateX(0); opacity: 1; }
-    }
-    
-    .user-message {
-      animation: slideInRight 0.3s ease-out;
-      margin-left: auto;
-      margin-bottom: 12px;
-    }
-    
-    .bot-message {
-      animation: slideInLeft 0.3s ease-out;
-      margin-right: auto;
-      margin-bottom: 12px;
-    }
-    
-    .chat-container {
-      scrollbar-width: thin;
-      scrollbar-color: #CBD5E0 #F7FAFC;
-      padding: 1rem;
-      background-color: #f8f9fa;
-      border-radius: 8px;
-      flex-grow: 3;
-      min-height: 400px;
-    }
-    
-    .chat-container::-webkit-scrollbar {
-      width: 8px;
-    }
-    
-    .chat-container::-webkit-scrollbar-track {
-      background: #F7FAFC;
-    }
-    
-    .chat-container::-webkit-scrollbar-thumb {
-      background-color: #CBD5E0;
-      border-radius: 4px;
-    }
-    
-    .typing-indicator span {
-      animation: blink 1s infinite;
-    }
-    
-    .typing-indicator span:nth-child(2) {
-      animation-delay: 0.2s;
-    }
-    
-    .typing-indicator span:nth-child(3) {
-      animation-delay: 0.4s;
-    }
-    
-    @keyframes blink {
-      0% { opacity: 0.2; }
-      20% { opacity: 1; }
-      100% { opacity: 0.2; }
-    }
-    
-    .article-summary {
-      max-height: 0;
-      overflow: hidden;
-      transition: max-height 0.5s ease-out;
-    }
-    
-    .article-summary.open {
-      max-height: 500px;
-    }
-  </style>
+  <link rel="stylesheet" href="main.css">
 </head>
 <body class="bg-gray-100 h-screen flex flex-col">
   <header class="bg-white shadow-md p-4">
@@ -92,12 +19,11 @@
         <span class="text-sm text-gray-600 mr-2">Save History</span>
         <label class="relative inline-flex items-center cursor-pointer">
           <input type="checkbox" id="save-history" class="sr-only">
-          <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-purple-300 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
+          <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-purple-300 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
         </label>
       </div>
     </div>
   </header>
-
   <main class="flex-1 container mx-auto p-4 flex flex-col h-full">
     <div id="chat-container" class="flex-grow overflow-y-auto mb-2 chat-container">
       <div id="messages" class="space-y-6 pb-4">
@@ -106,8 +32,7 @@
         </div>
       </div>
     </div>
-
-    <!-- Alert Panel - Hidden by default -->
+    <!-- Alert Panel -->
     <div id="alert-panel" class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4 rounded shadow-md hidden">
       <div class="flex items-center">
         <div class="flex-shrink-0">
@@ -119,8 +44,7 @@
         </div>
       </div>
     </div>
-
-    <!-- Image Upload Section - Added before chat input form -->
+    <!-- Image Upload Section -->
     <div id="image-upload-section" class="bg-white p-4 mb-4 rounded-lg shadow-sm border border-gray-200 hidden">
       <h3 class="text-lg font-semibold mb-2 text-gray-800">Analyze Patient Image</h3>
       <div class="flex flex-col md:flex-row gap-3">
@@ -143,8 +67,7 @@
         <img id="preview-img" class="max-h-64 rounded-lg mx-auto border border-gray-300" />
       </div>
     </div>
-
-    <!-- Clinic Finder Panel - Hidden by default -->
+    <!-- Clinic Finder Panel -->
     <div id="clinic-finder" class="bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-4 mb-4 rounded shadow-md hidden">
       <div class="flex justify-between items-start">
         <div>
@@ -158,7 +81,6 @@
         </button>
       </div>
     </div>
-
     <!-- Chat Input Form -->
     <form id="chat-form" class="mt-auto">
       <div class="flex rounded-lg border bg-white overflow-hidden shadow-sm">
@@ -176,7 +98,6 @@
         </button>
       </div>
     </form>
-
     <!-- Health Resources Section -->
     <section class="mt-2">
       <h2 class="text-lg font-semibold mb-1 text-gray-800">Health Resources</h2>
@@ -197,7 +118,6 @@
             This article discusses the importance of preventive healthcare, including regular screenings, vaccinations, and lifestyle modifications that can prevent diseases before they occur.
           </div>
         </div>
-
         <div class="bg-white p-2 rounded-lg shadow">
           <h3 class="font-medium text-lg text-gray-800">Nutrition and Wellness Guidelines</h3>
           <p class="text-gray-600 my-2">A balanced diet and proper nutrition are fundamental to maintaining good health and preventing chronic diseases.</p>
@@ -214,7 +134,6 @@
             This article covers nutrition principles, meal planning strategies, and how to incorporate a balanced diet into daily life for optimal health outcomes.
           </div>
         </div>
-
         <div class="bg-white p-2 rounded-lg shadow">
           <h3 class="font-medium text-lg text-gray-800">Mental Health Support and Resources</h3>
           <p class="text-gray-600 my-2">Recognizing mental health signs and seeking appropriate support are crucial for overall wellbeing.</p>
@@ -233,352 +152,12 @@
         </div>
       </div>
     </section>
-
     <div class="mt-2 text-center">
       <button id="new-chat" class="bg-purple-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-purple-700 transition-colors">
         <i class="fas fa-plus-circle mr-2"></i> Start New Chat
       </button>
     </div>
   </main>
-  <script id="app-script">
-    document.addEventListener('DOMContentLoaded', function() {
-      // DOM Elements
-      const chatForm = document.getElementById('chat-form');
-      const userInput = document.getElementById('user-input');
-      const messagesContainer = document.getElementById('messages');
-      const chatContainer = document.getElementById('chat-container');
-      const saveHistoryToggle = document.getElementById('save-history');
-      const newChatButton = document.getElementById('new-chat');
-      const alertPanel = document.getElementById('alert-panel');
-      const alertMessage = document.getElementById('alert-message');
-      const clinicFinder = document.getElementById('clinic-finder');
-      const closeClinicFinder = document.getElementById('close-clinic-finder');
-      const summarizeButtons = document.querySelectorAll('.summarize-btn');
-      
-      // Image Upload Elements
-      const imageFileInput = document.getElementById('image-file-input');
-      const uploadImageButton = document.getElementById('upload-image-button');
-      const imagePreview = document.getElementById('image-preview');
-      const previewImg = document.getElementById('preview-img');
-      
-      // Make image upload section always visible
-      document.getElementById('image-upload-section').classList.remove('hidden');
-      
-      // Check localStorage for history preference
-      if (localStorage.getItem('saveHistory') === 'true') {
-        saveHistoryToggle.checked = true;
-        loadChatHistory();
-      }
-      
-      // Save history toggle event
-      saveHistoryToggle.addEventListener('change', function() {
-        if (this.checked) {
-          localStorage.setItem('saveHistory', 'true');
-          saveChatHistory();
-        } else {
-          localStorage.setItem('saveHistory', 'false');
-          localStorage.removeItem('chatHistory');
-        }
-      });
-      
-      // Image preview functionality
-      imageFileInput.addEventListener('change', function() {
-        const file = this.files[0];
-        if (file) {
-          const reader = new FileReader();
-          reader.onload = function(e) {
-            previewImg.src = e.target.result;
-            imagePreview.classList.remove('hidden');
-          }
-          reader.readAsDataURL(file);
-        }
-      });
-      
-      // Image upload and analysis
-      uploadImageButton.addEventListener('click', function() {
-        const file = imageFileInput.files[0];
-        if (file) {
-          // Add a temporary message showing the image is being processed
-          addMessage('Analyzing your uploaded image...', 'bot');
-          
-          // Call the image analysis function
-          callImageAnalysisLoop(file);
-        } else {
-          alert('Please select an image to analyze.');
-        }
-      });
-      
-      // Function to handle image analysis with the built-in model
-      function callImageAnalysisLoop(imageFile) {
-        // Create FormData to send the file
-        const formData = new FormData();
-        formData.append('image', imageFile);
-        
-        // In a real implementation, you'd send the image to your backend
-        // Simulate sending the image to backend with the built-in model
-        console.log('Processing image with built-in model');
-        
-        // For this prototype, we'll simulate a response after a delay
-        setTimeout(() => {
-          // Simulate model analysis outcomes
-          const detectionProbability = Math.random();
-          let analysisResult = '';
-          
-          if (detectionProbability > 0.7) {
-            // Abnormality detected scenario
-            const confidence = Math.floor(75 + Math.random() * 20);
-            const locations = ['lower right quadrant', 'upper left region', 'central area', 'peripheral tissue'];
-            const randomLocation = locations[Math.floor(Math.random() * locations.length)];
-            
-            analysisResult = `Based on the uploaded image analysis:\n\n` +
-              `- Primary finding: Potential abnormality detected in ${randomLocation}\n` +
-              `- Confidence score: ${confidence}%\n` +
-              `- Recommended action: Follow-up with healthcare provider within 2 weeks\n` +
-              `- Additional notes: The image quality is sufficient for analysis, and the analysis has identified patterns consistent with potential concerns.`;
-          } else if (detectionProbability > 0.4) {
-            // Uncertain results scenario
-            analysisResult = `Based on the uploaded image analysis:\n\n` +
-              `- Primary finding: Inconclusive results\n` +
-              `- Confidence score: ${Math.floor(50 + Math.random() * 20)}%\n` +
-              `- Recommended action: Consider retaking image with better lighting/positioning\n` +
-              `- Additional notes: The analysis detected some potential concerns but confidence is not high enough for a definitive assessment.`;
-          } else {
-            // No abnormality detected scenario
-            analysisResult = `Based on the uploaded image analysis:\n\n` +
-              `- Primary finding: No significant abnormalities detected\n` +
-              `- Confidence score: ${Math.floor(80 + Math.random() * 15)}%\n` +
-              `- Recommended action: Continue regular monitoring\n` +
-              `- Additional notes: The image has been thoroughly analyzed and no concerning patterns were identified.`;
-          }
-          
-          console.log('Image analysis complete');
-          
-          // Display the analysis as a bot message
-          addMessage(analysisResult, 'bot');
-          
-          // Reset the image upload form
-          imageFileInput.value = '';
-          imagePreview.classList.add('hidden');
-          
-          // Save chat history if enabled
-          if (saveHistoryToggle.checked) {
-            saveChatHistory();
-          }
-        }, 3000);
-      }
-      
-      // Chat form submission
-      chatForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        const userMessage = userInput.value.trim();
-        
-        if (userMessage) {
-          // Add user message to chat
-          addMessage(userMessage, 'user');
-          
-          // Clear input field
-          userInput.value = '';
-          
-          // Show typing indicator and process message
-          showTypingIndicator(userMessage);  // Pass userMessage to the function
-        
-          // Process message to determine if special panels should be shown
-          processUserMessage(userMessage);
-          
-          // Save chat history if enabled
-          if (saveHistoryToggle.checked) {
-            saveChatHistory();
-          }
-        }
-      });
-      
-      // New chat button event
-      newChatButton.addEventListener('click', function() {
-        // Clear chat messages
-        messagesContainer.innerHTML = '';
-        
-        // Add initial bot message
-        addMessage('Hello! I\'m your Peer+ health assistant. How can I help you today?', 'bot');
-        
-        // Clear localStorage if save history is enabled
-        if (saveHistoryToggle.checked) {
-          localStorage.removeItem('chatHistory');
-        }
-        
-        // Hide any open panels
-        alertPanel.classList.add('hidden');
-        clinicFinder.classList.add('hidden');
-      });
-      
-      // Close clinic finder
-      closeClinicFinder.addEventListener('click', function() {
-        clinicFinder.classList.add('hidden');
-      });
-      
-      // Summarize buttons
-      summarizeButtons.forEach(button => {
-        const articleId = button.getAttribute('data-article-id');
-        const summary = document.getElementById(`summary-${articleId}`);
-        
-        // Hide summaries initially
-        summary.classList.remove('open');
-        
-        button.addEventListener('click', function() {
-          summary.classList.toggle('open');
-          const icon = this.querySelector('i');
-          
-          if (summary.classList.contains('open')) {
-            icon.classList.remove('fa-compress-alt');
-            icon.classList.add('fa-expand-alt');
-            this.innerHTML = '<i class="fas fa-expand-alt mr-1"></i> Hide Summary';
-          } else {
-            icon.classList.remove('fa-expand-alt');
-            icon.classList.add('fa-compress-alt');
-            this.innerHTML = '<i class="fas fa-compress-alt mr-1"></i> Summarize';
-          }
-        });
-      });
-      
-      // Helper Functions
-      function addMessage(text, sender) {
-        const messageDiv = document.createElement('div');
-        messageDiv.textContent = text;
-        
-        if (sender === 'user') {
-          messageDiv.className = 'user-message bg-purple-600 text-white p-3 rounded-lg shadow max-w-[80%] w-fit';
-        } else {
-          messageDiv.className = 'bot-message bg-white text-gray-800 p-3 rounded-lg shadow max-w-[80%] w-fit';
-        }
-        
-        messagesContainer.appendChild(messageDiv);
-        scrollToBottom();
-      }
-      
-      function showTypingIndicator(userInput) {  // Update to accept parameter
-        const typingDiv = document.createElement('div');
-        typingDiv.className = 'bot-message typing-indicator bg-white text-gray-800 p-3 rounded-lg shadow max-w-[80%] w-fit';
-        typingDiv.innerHTML = 'Thinking<span>.</span><span>.</span><span>.</span>';
-        typingDiv.id = 'typing-indicator';
-        messagesContainer.appendChild(typingDiv);
-        scrollToBottom();
-        
-        // Call the Symptom Advisor Loop with the user message
-        callSymptomAdvisorLoop(userInput);  // Use the passed parameter
-      }
-      
-      function callSymptomAdvisorLoop(userInput) {
-        const systemPrompt = "You are a health assistant that mimics a highly experienced and trained doctor. When given symptoms, provide a detailed response, stating 3-5 diseases that could occur in the person, while also providing a treatment plan. Please always respond in the language you are given the prompt in by the user.";
-        
-        fetch('https://magicloops.dev/api/loop/16856f65-dac8-402f-9d31-d04c336c5959/run', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            messages: [
-              {
-                role: 'system',
-                content: systemPrompt
-              },
-              {
-                role: 'user',
-                content: userInput
-              }
-            ],
-            location: {
-              latitude: 37.7749,
-              longitude: -122.4194
-            }
-          })
-        })
-        .then(response => {
-          if (!response.ok) {
-            throw new Error('Network response was not ok');
-          }
-          return response.json();
-        })
-        .then(data => {
-          console.log('API Response:', data);
-          // Remove typing indicator
-          document.getElementById('typing-indicator').remove();
-          // Display response in chat
-          addMessage(data.response, 'bot');
-        })
-        .catch(error => {
-          console.error('Error calling Symptom Advisor Loop:', error);
-          // Remove typing indicator
-          document.getElementById('typing-indicator').remove();
-          // Show error message
-          addMessage('Sorry, I encountered an error processing your request. Please try again.', 'bot');
-        });
-      }
-      
-      function botResponse() {
-        // This is a prototype, so we'll just use a generic response
-        // AI response will be displayed as a white chat bubble in the messages container
-        addMessage('This is a prototype. In the full version, you would receive personalized responses based on your questions.', 'bot');
-        // Ensure chat scrolls to show the new AI response
-        scrollToBottom();
-      }
-      
-      function scrollToBottom() {
-        // Auto-scroll to the bottom when a new message is added
-        chatContainer.scrollTop = chatContainer.scrollHeight;
-      }
-      
-      function saveChatHistory() {
-        if (saveHistoryToggle.checked) {
-          const messages = Array.from(messagesContainer.children).map(msg => {
-            return {
-              text: msg.textContent,
-              sender: msg.classList.contains('user-message') ? 'user' : 'bot'
-            };
-          });
-          
-          localStorage.setItem('chatHistory', JSON.stringify(messages));
-        }
-      }
-      
-      function loadChatHistory() {
-        const history = localStorage.getItem('chatHistory');
-        
-        if (history) {
-          const messages = JSON.parse(history);
-          
-          // Clear existing messages
-          messagesContainer.innerHTML = '';
-          
-          // Add messages from history
-          messages.forEach(msg => {
-            addMessage(msg.text, msg.sender);
-          });
-        }
-      }
-      
-      function processUserMessage(userMessage) {
-        // Simple keyword detection for demo purposes
-        const lowercaseMsg = userMessage.toLowerCase();
-        
-        // Check for emergency keywords
-        if (lowercaseMsg.includes('emergency') || 
-            lowercaseMsg.includes('severe pain') || 
-            lowercaseMsg.includes('chest pain')) {
-          
-          // Show alert panel
-          alertMessage.textContent = 'If you\'re experiencing a medical emergency, please call 911 or go to your nearest emergency room.';
-          alertPanel.classList.remove('hidden');
-        }
-        
-        // Check for clinic finder keywords
-        if (lowercaseMsg.includes('doctor near') || 
-            lowercaseMsg.includes('find clinic') || 
-            lowercaseMsg.includes('nearby provider')) {
-          
-          // Show clinic finder panel
-          clinicFinder.classList.remove('hidden');
-        }
-      }
-    });
-  </script>
+  <script src="main.js"></script>
 </body>
 </html>
