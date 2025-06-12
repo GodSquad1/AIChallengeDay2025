@@ -1,0 +1,72 @@
+@keyframes slideInLeft {
+  from { transform: translateX(-100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes slideInRight {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+.user-message {
+  animation: slideInRight 0.3s ease-out;
+  margin-left: auto;
+  margin-bottom: 12px;
+}
+
+.bot-message {
+  animation: slideInLeft 0.3s ease-out;
+  margin-right: auto;
+  margin-bottom: 12px;
+}
+
+.chat-container {
+  scrollbar-width: thin;
+  scrollbar-color: #CBD5E0 #F7FAFC;
+  padding: 1rem;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  flex-grow: 3;
+  min-height: 400px;
+}
+
+.chat-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.chat-container::-webkit-scrollbar-track {
+  background: #F7FAFC;
+}
+
+.chat-container::-webkit-scrollbar-thumb {
+  background-color: #CBD5E0;
+  border-radius: 4px;
+}
+
+.typing-indicator span {
+  animation: blink 1s infinite;
+}
+
+.typing-indicator span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.typing-indicator span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes blink {
+  0% { opacity: 0.2; }
+  20% { opacity: 1; }
+  100% { opacity: 0.2; }
+}
+
+.article-summary {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.5s ease-out;
+}
+
+.article-summary.open {
+  max-height: 500px;
+}
